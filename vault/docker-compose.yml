@@ -1,0 +1,26 @@
+version: '3'
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+
+services:
+  vault:
+    image: vault
+    container_name: vault
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config=/vault/config/config.json
+    volumes:
+      - $PWD/file:/vault/file
+      - $PWD/config:/vault/config
+    labels:
+        - traefik.port=8200
+        - traefik.frontend.rule=Host:${HOSTNAME}
+        - traefik.docker.network=web
+        - traefik.backend=vault
+    networks:
+      - internal
+      - web

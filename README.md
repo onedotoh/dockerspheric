@@ -1,2 +1,2 @@
-# dockerspheric
-Docker compose files
+# Dockerspheric
+Docker composer files for various containers
