@@ -1,10 +1,9 @@
-version: '3'
+version: '3.5'
 
 networks:
-  web:
+  public:
+    name: public
     external: true
-  internal:
-    external: false
 
 volumes:
   portainer_data:
@@ -23,8 +22,8 @@ services:
     labels:
         - traefik.port=9000
         - traefik.frontend.rule=Host:${HOSTNAME};PathPrefixStrip:/portainer
-        - traefik.docker.network=web
+        - traefik.docker.network=public
         - traefik.backend=portainer
     networks:
-      - internal
-      - web
+      - public
+    restart: always

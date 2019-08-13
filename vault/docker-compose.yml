@@ -1,9 +1,11 @@
-version: '3'
+version: '3.5'
 
 networks:
-  web:
+  public:
+    name: public
     external: true
-  internal:
+  vault:
+    name: vault
     external: false
 
 services:
@@ -12,15 +14,20 @@ services:
     container_name: vault
     cap_add:
       - IPC_LOCK
-    entrypoint: vault server -config=/vault/config/config.json
+    command: server
+    environment:
+      - VAULT_LOCAL_CONFIG={"backend":{"file":{"path":"/vault/file"}},"listener":{"tcp":{"address":"0.0.0.0:8200","tls_disable":1}},"ui":true,"api_addr":"http://0.0.0.0:8201"}
     volumes:
       - $PWD/file:/vault/file
       - $PWD/config:/vault/config
+    ports:
+      - '8200:8200'
     labels:
-        - traefik.port=8200
-        - traefik.frontend.rule=Host:${HOSTNAME}
-        - traefik.docker.network=web
-        - traefik.backend=vault
+      - traefik.port=8200
+      - traefik.frontend.rule=Host:${HOSTNAME}
+      - traefik.docker.network=public
+      - traefik.backend=vault
     networks:
-      - internal
-      - web
+      - public
+      - vault
+    restart: always

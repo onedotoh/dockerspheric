@@ -1,9 +1,9 @@
-version: '3'
+version: '3.5'
 
 networks:
   public:
-    external: false
-
+    name: public
+    external: true
 
 services:
   traefik:
@@ -11,7 +11,6 @@ services:
     image: 'traefik:1.7.2-alpine'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
-      - '$PWD/acme.json:/acme.json'
     ports:
       - '80:80'
       - '443:443'
@@ -30,9 +29,14 @@ services:
       - "--acme"
       - "--acme.storage=acme.json"
       - "--acme.entryPoint=https"
-      - "--acme.httpChallenge.entryPoint=http"
+      - "--acme.dnsChallenge.provider=cloudflare"
+      - "--acme.dnsChallenge.delayBeforeCheck=0"
       - "--acme.onHostRule=true"
       - "--acme.email=${SSL_EMAIL}"
       - "--docker"
       - "--docker.watch"
       - "--docker.network=public"
+    environment:
+      - CLOUDFLARE_EMAIL=${CF_EMAIL}
+      - CLOUDFLARE_API_KEY=${CF_API_KEY}
+    restart: always
