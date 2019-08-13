@@ -1,0 +1,40 @@
+version: '3.5'
+
+
+networks: 
+  ${NETWORK_NAME}:
+    name: ${NETWORK_NAME}
+    external: false
+  public:
+    external: true
+    name: public
+
+services:
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - ${PORT}:80
+    environment:
+      WORDPRESS_DB_HOST: database
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_TABLE_PREFIX: ${DB_PREFIX}
+    labels:
+      - traefik.port=${PORT}
+      - traefik.frontend.rule=Host:${HOSTNAME}
+      - traefik.docker.network=public
+      - traefik.backend=${PROJECT_NAME}
+    networks:
+      - public
+      - ${NETWORK_NAME}
+
+  database:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
