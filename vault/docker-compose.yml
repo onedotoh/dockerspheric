@@ -8,6 +8,10 @@ networks:
     name: vault
     external: false
 
+volumes:
+  vault_data:
+    driver: local
+
 services:
   vault:
     image: vault
@@ -18,8 +22,7 @@ services:
     environment:
       - VAULT_LOCAL_CONFIG={"backend":{"file":{"path":"/vault/file"}},"listener":{"tcp":{"address":"0.0.0.0:8200","tls_disable":1}},"ui":true,"api_addr":"http://0.0.0.0:8201"}
     volumes:
-      - $PWD/file:/vault/file
-      - $PWD/config:/vault/config
+      - vault_data:/vault/file
     ports:
       - '8200:8200'
     labels:
