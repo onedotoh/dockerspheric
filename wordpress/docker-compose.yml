@@ -2,12 +2,16 @@ version: '3.5'
 
 
 networks: 
-  ${NETWORK_NAME}:
-    name: ${NETWORK_NAME}
-    external: false
-  public:
+  project:
+    name: ${PROJECT_NAME}
     external: true
+  public:
     name: public
+    external: true
+  databases:
+    name: databases
+    external: true
+
 
 services:
   wordpress:
@@ -28,7 +32,7 @@ services:
       - traefik.backend=${PROJECT_NAME}
     networks:
       - public
-      - ${NETWORK_NAME}
+      - project
 
   database:
     image: mysql:5.7
@@ -38,3 +42,6 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    networks: 
+      - databases
+      - project
